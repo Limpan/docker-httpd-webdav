@@ -10,11 +10,11 @@ logger = logging.getLogger()
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.environ.get('DATA_DIR') or '/srv/dav/data'
+DATA_DIR = os.environ.get('DATA_DIR') or '/var/lib/dav/data'
 logger.debug('BASE_DIR: %s', BASE_DIR)
 logger.debug('DATA_DIR: %s', DATA_DIR)
 
-DATASTORE = os.path.abspath(os.path.join(BASE_DIR, os.environ.get('DATASTORE') or './users.json'))
+DATASTORE = os.path.abspath(os.path.join(BASE_DIR, os.environ.get('DATASTORE') or '/user.json'))
 ARCHIVE_DIR = os.path.join(DATA_DIR, '_archive/')
 logger.debug('DATASTORE: %s', DATASTORE)
 logger.debug('ARCHIVE_DIR: %s', ARCHIVE_DIR)
@@ -33,20 +33,26 @@ class XKCD():
 
 
 def _load_datastore():
-    logger.info('Loading datastore.')
+    logger.debug('Loading datastore.')
     try:
         if os.path.isfile(DATASTORE):
             logger.debug('Loading datastore from %s', DATASTORE)
             with open(DATASTORE, 'r') as f:
-                return json.load(f)
+                ds = json.load(f)
     except Exception as e:
-        logger.error('Failed to load datastore at %s', DATASTORE)
-    logger.debug('Creating new datastore.')
-    return {'users': {}}
+        logger.info('Failed to load datastore at %s', DATASTORE)
+        try:
+            ds = {'users': {}}
+            with open(DATASTORE, 'w') as f:
+                json.dump(ds, f)
+                logger.debug('Creating new datastore.')
+        except Exception as e:
+            logger.critical('Failed to initialize datastore.')
+    return ds
 
 
 def _save_datastore(ds):
-    logger.info('Saving datastore.')
+    logger.debug('Saving datastore.')
     try:
         with open(DATASTORE, 'w') as f:
             json.dump(ds, f)
@@ -55,7 +61,8 @@ def _save_datastore(ds):
 
 
 def _hash_password(password):
-  return bcrypt.hashpw(password.encode(), bcrypt.gensalt(rounds=10)).decode()
+  hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt(rounds=10)).decode()
+  return '$2y$' + hash[4:]
 
 
 @click.group()
@@ -75,7 +82,7 @@ def passwd():
 
 
 @cli.command()
-@click.argument('names', nargs=-1, help='List of users.')  # Allow unlimited number of usernames
+@click.argument('names', nargs=-1)  # Allow unlimited number of usernames
 def add(names):
     """Add new user."""
     xkcd = XKCD()
@@ -108,7 +115,7 @@ def add(names):
 
 
 @cli.command()
-@click.argument('names', nargs=-1, help='List of users.')
+@click.argument('names', nargs=-1)
 def remove(names):
     """Move existing user to archive directory."""
     try:

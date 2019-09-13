@@ -3,8 +3,6 @@ set -e
 
 # Environment variables that are used if not empty:
 #   SERVER_NAMES
-#   USERNAME
-#   PASSWORD
 
 # Just in case this environment variable has gone missing.
 HTTPD_PREFIX="${HTTPD_PREFIX:-/usr/local/apache2}"
@@ -22,10 +20,11 @@ if [ "x$SERVER_NAMES" != "x" ]; then
         -i "$HTTPD_PREFIX"/conf/sites-available/default.conf
 fi
 
-# Add password hash, unless "user.passwd" already exists (ie, bind mounted).
-if [ ! -e "/user.passwd" ]; then
-    user passwd > /user.passwd
-fi
+# Set permissions for /user.json
+[ -e "/user.json" ] && chmod 644 "/user.json"
+
+# Generate "user.passwd" unless it already exists.
+user passwd > /user.passwd
 
 [ ! -d "/var/www/html" ] && mkdir -p "/var/www/html"
 chown -R www-data:www-data "/var/www/html"

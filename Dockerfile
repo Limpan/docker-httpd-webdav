@@ -7,23 +7,30 @@ FROM httpd:2.4.37-alpine
 # Copy in our configuration files.
 COPY conf/ conf/
 
-RUN set -ex;
-    # Install Python and dependencies
-    apk add --update \
-        python \
-        python-dev \
-        py-pip \
-        build-base; \
+RUN set -ex; \
+    # Install build dependencies
+    apk add --no-cache --virtual .build-deps \
+        build-base \
+        python3-dev \
+        libffi-dev; \
     \
-    # Install Python modules for management script.
+    # Install Python and PIP
+    apk add --no-cache --update \
+        python3 \
+        py3-setuptools; \
+    \
+    # Upgrade PIP
+    pip3 install --upgrade pip; \
+    \
+    # Install Python packages
     pip install \
         arrow \
         bcrypt \
         click \
-        xkcdpass;
+        xkcdpass; \
     \
-    # Clean up.
-    rm -rf /var/cache/apk/*
+    # Remove dependencies
+    apk del .build-deps; \
     \
     # Create empty default DocumentRoot.
     mkdir -p "/var/www/html"; \
@@ -62,13 +69,11 @@ RUN set -ex;
     mkdir -p "conf/conf-enabled"; \
     mkdir -p "conf/sites-enabled"; \
     ln -s ../conf-available/dav.conf "conf/conf-enabled"; \
+    ln -s ../conf-available/git.conf "conf/conf-enabled"; \
     ln -s ../sites-available/default.conf "conf/sites-enabled";
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 COPY user.py /usr/local/bin/user
-
-HEALTHCHECK --interval=1m --timeout=1s \
-  CMD curl -f http://localhost:80 || exit 1
 
 EXPOSE 80/tcp
 ENTRYPOINT [ "docker-entrypoint.sh" ]

@@ -13,16 +13,13 @@ services:
     volumes:
       - /srv/html:/var/www/html
       - /srv/dav:/var/lib/dav
-      - ./users.json:/users.json
+      - ${PWD}/user.json:/user.json
     labels:
       - "traefik.docker.network=web"
       - "traefik.enable=true"
       - "traefik.httpd.frontend.rule=Host:njudung.etnolit.se"
       - "traefik.httpd.port=80"
       - "traefik.httpd.protocol=http"
-#      - "traefik.httpd-dav.frontend.rule=Host:dav.njudung.etnolit.se"
-#      - "traefik.httpd-dav.port=80"
-#      - "traefik.httpd-dav.protocol=http"
 
 networks:
   web:
