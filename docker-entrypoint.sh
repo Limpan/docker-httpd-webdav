@@ -24,17 +24,7 @@ fi
 
 # Add password hash, unless "user.passwd" already exists (ie, bind mounted).
 if [ ! -e "/user.passwd" ]; then
-    touch "/user.passwd"
-    # Only generate a password hash if both username and password given.
-    if [ "x$USERNAME" != "x" ] && [ "x$PASSWORD" != "x" ]; then
-        if [ "$AUTH_TYPE" = "Digest" ]; then
-            # Can't run `htdigest` non-interactively, so use other tools.
-            HASH="`printf '%s' "$USERNAME:$REALM:$PASSWORD" | md5sum | awk '{print $1}'`"
-            printf '%s\n' "$USERNAME:$REALM:$HASH" > /user.passwd
-        else
-            htpasswd -B -b -c "/user.passwd" $USERNAME $PASSWORD
-        fi
-    fi
+    user passwd > /user.passwd
 fi
 
 [ ! -d "/var/www/html" ] && mkdir -p "/var/www/html"

@@ -5,3 +5,5 @@ Provides a basic web server with support for personal user accounts. All user di
 ## Usage
 
 Make sure to set up the container behind a reverse proxy with HTTPS.
+
+Manage users with docker-compose exec

@@ -7,7 +7,24 @@ FROM httpd:2.4.37-alpine
 # Copy in our configuration files.
 COPY conf/ conf/
 
-RUN set -ex; \
+RUN set -ex;
+    # Install Python and dependencies
+    apk add --update \
+        python \
+        python-dev \
+        py-pip \
+        build-base; \
+    \
+    # Install Python modules for management script.
+    pip install \
+        arrow \
+        bcrypt \
+        click \
+        xkcdpass;
+    \
+    # Clean up.
+    rm -rf /var/cache/apk/*
+    \
     # Create empty default DocumentRoot.
     mkdir -p "/var/www/html"; \
     # Create directories for Dav data and lock database.
@@ -48,9 +65,10 @@ RUN set -ex; \
     ln -s ../sites-available/default.conf "conf/sites-enabled";
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY user.py /usr/local/bin/user
 
-#HEALTHCHECK --interval=1m --timeout=1s \
-#  CMD curl -f http://localhost:8080 || exit 1
+HEALTHCHECK --interval=1m --timeout=1s \
+  CMD curl -f http://localhost:80 || exit 1
 
 EXPOSE 80/tcp
 ENTRYPOINT [ "docker-entrypoint.sh" ]
