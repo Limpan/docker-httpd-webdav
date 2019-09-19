@@ -5,7 +5,7 @@ from xkcdpass import xkcd_password as xkcdpass
 
 DEBUG = True if os.environ.get('DEBUG') is not None else False
 
-logging.basicConfig(stream=sys.stderr, level=logging.DEBUG if DEBUG else logging.INFO)
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG if DEBUG else logging.ERROR)
 logger = logging.getLogger()
 
 
