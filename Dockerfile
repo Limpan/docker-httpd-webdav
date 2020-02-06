@@ -32,6 +32,11 @@ RUN set -ex; \
     # Remove dependencies
     apk del .build-deps; \
     \
+    # Enable FCGI
+    for i in proxy proxy_fcgi; do \
+        sed -i -e "/^#LoadModule ${i}_module.*/s/^#//" "conf/httpd.conf"; \
+    done; \
+    \
     # Create empty default DocumentRoot.
     mkdir -p "/var/www/html"; \
     # Create directories for Dav data and lock database.

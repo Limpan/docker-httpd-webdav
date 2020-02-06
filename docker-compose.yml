@@ -6,6 +6,7 @@ services:
     restart: always
     networks:
       - web
+      - backend
     expose:
       - "80"
     environment:
@@ -20,7 +21,17 @@ services:
       - "traefik.httpd.frontend.rule=Host:njudung.etnolit.se"
       - "traefik.httpd.port=80"
       - "traefik.httpd.protocol=http"
+  php:
+    image: php:fpm-alpine
+    networks:
+      - backend
+    expose:
+      - "9000"
+    volumes:
+      - /srv/html:/var/www/html
+      - /srv/dav/data:/var/lib/dav/data
 
 networks:
   web:
     external: true
+  backend:
