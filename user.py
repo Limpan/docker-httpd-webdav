@@ -35,19 +35,29 @@ class XKCD():
 def _load_datastore():
     logger.debug('Loading datastore.')
     try:
-        if os.path.isfile(DATASTORE):
-            logger.debug('Loading datastore from %s', DATASTORE)
-            with open(DATASTORE, 'r') as f:
-                ds = json.load(f)
+        with open(DATASTORE, 'r') as f:
+            if os.fstat(f.st_size) > 0:
+                logger.debug('Loading datastore from %s', DATASTORE)
+                return json.load(f)
+            else:
+                logger.debug('No contents in %s', DATASTORE)
+                return _init_datastore()
     except Exception as e:
         logger.info('Failed to load datastore at %s', DATASTORE)
-        try:
-            ds = {'users': {}}
-            with open(DATASTORE, 'w') as f:
-                json.dump(ds, f)
-                logger.debug('Creating new datastore.')
-        except Exception as e:
-            logger.critical('Failed to initialize datastore.')
+        return _init_datastore()
+
+
+def _init_datastore():
+    logger.debug('Initializing datastore.')
+    ds = {'users': {}}
+
+    try:
+        with open(DATASTORE, 'w') as f:
+            json.dump(ds, f)
+    except Exception as e:
+        logger.critical('Failed to initialize datastore.')
+        raise e
+
     return ds
 
 
