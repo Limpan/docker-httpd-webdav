@@ -102,7 +102,7 @@ def sql():
                           GRANT ALL PRIVILEGES on {db}.* to '{user}'@'{host}';""".format(user=name,
                                                                                          hash=data['passwd'],
                                                                                          db=name,
-                                                                                         host='httpd'))
+                                                                                         host='%'))
     click.echo("FLUSH PRIVILEGES;")
 
 @cli.command()
