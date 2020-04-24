@@ -1,0 +1,5 @@
+# Configuration file for MariaDB
+[mysqld]
+plugin_dir=/usr/lib/x86_64-linux-gnu/mariadb18/plugin/
+plugin_maturity=unknown
+plugin_load=auth_bcrypt

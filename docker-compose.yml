@@ -2,7 +2,9 @@ version: '3'
 
 services:
   httpd:
-    build: .
+    build:
+      context: .
+      dockerfile: httpd/Dockerfile
     restart: always
     networks:
       - web
@@ -30,6 +32,20 @@ services:
     volumes:
       - /srv/html:/var/www/html
       - /srv/dav/data:/var/lib/dav/data
+  db:
+    build:
+      context: .
+      dockerfile: mariadb/Dockerfile
+    restart: always
+    networks:
+      - backend
+    expose:
+      - "3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - /srv/mariadb:/var/lib/mysql
+      - ${PWD}/user.json:/user.json
 
 networks:
   web:

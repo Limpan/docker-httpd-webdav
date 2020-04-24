@@ -36,12 +36,8 @@ def _load_datastore():
     logger.debug('Loading datastore.')
     try:
         with open(DATASTORE, 'r') as f:
-            if os.fstat(f.st_size) > 0:
-                logger.debug('Loading datastore from %s', DATASTORE)
-                return json.load(f)
-            else:
-                logger.debug('No contents in %s', DATASTORE)
-                return _init_datastore()
+            logger.debug('Loading datastore from %s', DATASTORE)
+            return json.load(f)
     except Exception as e:
         logger.info('Failed to load datastore at %s', DATASTORE)
         return _init_datastore()
@@ -49,11 +45,13 @@ def _load_datastore():
 
 def _init_datastore():
     logger.debug('Initializing datastore.')
-    ds = {'users': {}}
 
     try:
         with open(DATASTORE, 'w') as f:
             json.dump(ds, f)
+    except PermissionError as e:
+        logger.error('Failed to write file to file {}.'.format(DATASTORE))
+        raise e
     except Exception as e:
         logger.critical('Failed to initialize datastore.')
         raise e
@@ -90,6 +88,22 @@ def passwd():
       if data['active'] is True:
           click.echo('{}:{}'.format(name, data['passwd']))
 
+
+@cli.command()
+def sql():
+    """Generate SQL."""
+    logger.info('Generating SQL-file')
+    ds = _load_datastore()
+
+    for name, data in ds['users'].items():
+        if data['active'] is True:
+            click.echo("""CREATE DATABASE IF NOT EXISTS {db};
+                          CREATE USER IF NOT EXISTS '{user}'@'{host}' IDENTIFIED WITH bcrypt USING '{hash}';
+                          GRANT ALL PRIVILEGES on {db}.* to '{user}'@'{host}';""".format(user=name,
+                                                                                         hash=data['passwd'],
+                                                                                         db=name,
+                                                                                         host='httpd'))
+    click.echo("FLUSH PRIVILEGES;")
 
 @cli.command()
 @click.argument('names', nargs=-1)  # Allow unlimited number of usernames

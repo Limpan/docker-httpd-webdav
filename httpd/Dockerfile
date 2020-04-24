@@ -5,7 +5,7 @@ FROM httpd:2.4.37-alpine
 # WORKDIR "$HTTPD_PREFIX"
 
 # Copy in our configuration files.
-COPY conf/ conf/
+COPY httpd/conf/ conf/
 
 RUN set -ex; \
     # Install build dependencies
@@ -77,7 +77,7 @@ RUN set -ex; \
     ln -s ../conf-available/git.conf "conf/conf-enabled"; \
     ln -s ../sites-available/default.conf "conf/sites-enabled";
 
-COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY httpd/docker-entrypoint.sh /usr/local/bin/
 COPY user.py /usr/local/bin/user
 
 EXPOSE 80/tcp
