@@ -24,7 +24,10 @@ services:
       - "traefik.httpd.port=80"
       - "traefik.httpd.protocol=http"
   php:
-    image: php:fpm-alpine
+    build:
+      context: .
+      dockerfile: php/Dockerfile
+    restart: always
     networks:
       - backend
     expose:
