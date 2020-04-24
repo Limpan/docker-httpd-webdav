@@ -40,23 +40,7 @@ def _load_datastore():
             return json.load(f)
     except Exception as e:
         logger.info('Failed to load datastore at %s', DATASTORE)
-        return _init_datastore()
-
-
-def _init_datastore():
-    logger.debug('Initializing datastore.')
-
-    try:
-        with open(DATASTORE, 'w') as f:
-            json.dump(ds, f)
-    except PermissionError as e:
-        logger.error('Failed to write file to file {}.'.format(DATASTORE))
         raise e
-    except Exception as e:
-        logger.critical('Failed to initialize datastore.')
-        raise e
-
-    return ds
 
 
 def _save_datastore(ds):

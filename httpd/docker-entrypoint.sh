@@ -20,8 +20,11 @@ if [ "x$SERVER_NAMES" != "x" ]; then
         -i "$HTTPD_PREFIX"/conf/sites-available/default.conf
 fi
 
+# Init /user.json if not exists
+[ ! -e "/user.json"] && echo "{\"users\": {}}" > /user.json
+
 # Set permissions for /user.json
-[ -e "/user.json" ] && chmod 644 "/user.json"
+[ -e "/user.json" ] && chmod 664 "/user.json"
 
 # Generate "user.passwd" unless it already exists.
 user passwd > /user.passwd
