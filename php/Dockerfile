@@ -1,3 +1,8 @@
-FROM php:fpm-alpine
+FROM php:fpm
 
-RUN docker-php-ext-install mysqli
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  default-libmysqlclient-dev \
+  zlib1g-dev \
+  && docker-php-ext-configure pdo_mysql --with-pdo-mysql=/usr --with-zlib-dir=/usr \
+  && docker-php-ext-install -j$(nproc) pdo_mysql \
+  && rm -rf /var/lib/apt/lists/*
