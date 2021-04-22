@@ -1,4 +1,4 @@
-FROM httpd:2.4.37-alpine
+FROM httpd:2.4.46-alpine
 
 # These variables are inherited from the httpd:alpine image:
 # ENV HTTPD_PREFIX /usr/local/apache2
@@ -17,13 +17,14 @@ RUN set -ex; \
     # Install Python and PIP
     apk add --no-cache --update \
         python3 \
+        py-pip \
         py3-setuptools; \
     \
     # Upgrade PIP
-    pip3 install --upgrade pip; \
+    pip install --upgrade pip; \
     \
     # Install Python packages
-    pip install \
+    pip3 install \
         arrow \
         bcrypt \
         click \

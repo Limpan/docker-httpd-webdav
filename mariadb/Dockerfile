@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
   libmariadbclient18=1:10.1.44-0ubuntu0.18.04.1 \
   libbsd-dev
 
-RUN mkdir /bcrypt_auth_plugin && git clone https://github.com/Limpan/bcrypt_auth_plugin.git /bcrypt_auth_plugin
+RUN mkdir /bcrypt_auth_plugin && git clone --single-branch --branch cleartext https://github.com/Limpan/bcrypt_auth_plugin.git /bcrypt_auth_plugin
 
 RUN (cd /bcrypt_auth_plugin && make)
 
