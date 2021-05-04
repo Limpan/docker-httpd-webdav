@@ -4,9 +4,6 @@ FROM httpd:2.4.46-alpine
 # ENV HTTPD_PREFIX /usr/local/apache2
 # WORKDIR "$HTTPD_PREFIX"
 
-# Copy in our configuration files.
-COPY httpd/conf/ conf/
-
 RUN set -ex; \
     # Install build dependencies
     apk add --no-cache --virtual .build-deps \
@@ -31,8 +28,12 @@ RUN set -ex; \
         xkcdpass; \
     \
     # Remove dependencies
-    apk del .build-deps; \
-    \
+    apk del .build-deps;
+
+# Copy in our configuration files.
+COPY httpd/conf/ conf/
+    
+RUN set -ex; \
     # Enable FCGI
     for i in proxy proxy_fcgi; do \
         sed -i -e "/^#LoadModule ${i}_module.*/s/^#//" "conf/httpd.conf"; \
@@ -76,7 +77,8 @@ RUN set -ex; \
     mkdir -p "conf/sites-enabled"; \
     ln -s ../conf-available/dav.conf "conf/conf-enabled"; \
     ln -s ../conf-available/git.conf "conf/conf-enabled"; \
-    ln -s ../sites-available/default.conf "conf/sites-enabled";
+    ln -s ../sites-available/default.conf "conf/sites-enabled"; \
+    ln -s ../sites-available/default-dav.conf "conf/sites-enabled";
 
 COPY httpd/docker-entrypoint.sh /usr/local/bin/
 COPY user.py /usr/local/bin/user

@@ -23,6 +23,9 @@ services:
       - "traefik.httpd.frontend.rule=Host:njudung.etnolit.se"
       - "traefik.httpd.port=80"
       - "traefik.httpd.protocol=http"
+      - "traefik.httpd-dav.frontend.rule=Host:dav.njudung.etnolit.se"
+      - "traefik.httpd-dav.port=80"
+      - "traefik.httpd-dav.protocol=http"
   php:
     build:
       context: .
