@@ -21,7 +21,7 @@ if [ "x$SERVER_NAMES" != "x" ]; then
 fi
 
 # Init /user.json if not exists
-[ ! -e "/user.json"] && echo "{\"users\": {}}" > /user.json
+[ ! -e "/user.json" ] && echo "{\"users\": {}}" > /user.json
 
 # Set permissions for /user.json
 [ -e "/user.json" ] && chmod 664 "/user.json"
