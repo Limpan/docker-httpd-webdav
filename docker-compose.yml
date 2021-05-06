@@ -38,6 +38,7 @@ services:
     volumes:
       - /srv/html:/var/www/html
       - /srv/dav/data:/var/lib/dav/data
+    user: "82:82"
   db:
     build:
       context: .
